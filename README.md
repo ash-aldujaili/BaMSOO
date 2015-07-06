@@ -1,2 +1,2 @@
-# BaMSOO
-Bayesian Multi-Scale Optimistic Optimization
+# :sparkles: BaMSOO :sparkles:
+_Bayesian Multi-Scale Optimistic Optimization_
