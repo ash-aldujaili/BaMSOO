@@ -1,4 +1,4 @@
-function [yBest, xBest, nodes ]= BaMSOO(func, ftarget, dimension, maxRange, minRange, numEvaluations)
+function [yBest, xBest, nodes ]= BaMSOOv2(func, ftarget, dimension, maxRange, minRange, numEvaluations)
 %% BaMSOO : Bayesian Multi-Scale Optimistic Optimization
 % a tool for optimizing multi-dimensional bound-constrained black-box global optimization
 % problems.
@@ -33,9 +33,9 @@ opts.maxDepthFunc = ceil(sqrt(opts.MAX_FES));% or floor(10 * log(opts.MAX_FES)^(
 % (it is supposed to be a function of number of expansion, set to a constant here according to the paper "bandits attach function optimization"
 % add a condition if the full tree is explored and 
 opts.MAX_NUM_NODES = floor((opts.NUM_FOLDS^(opts.maxDepthFunc+2)-1)/(opts.NUM_FOLDS-1)); % (k^(n+1)-1)/(k-1)
-opts.EVAL_GAP = 5; % the difference between numevaluation and number of nodes
+opts.EVAL_GAP = 10; % the difference between numevaluation and number of nodes
 % visualization-related
-opts.showRect = true;
+opts.showRect = false;
 opts.IS_VERBOSE    = (opts.NUM_DIM == 2) && opts.showRect;
 
 
@@ -56,7 +56,7 @@ opts.minDepth=1;
 opts.maxDepth=1;
 opts.numNodes = 1;
 % GP stuffs
-sizeX = 3*opts.NUM_DIM;
+sizeX = 2*opts.NUM_DIM;
 X = zeros(sizeX,opts.NUM_DIM);
 y = zeros(sizeX,1);
 X(1,:) = root.x';
@@ -73,8 +73,8 @@ covRate = ceil(sizeX/2); % how often the covariance matrix is updated
 % kSE(x,x′)=σ2exp(−(x−x′)/2ℓ2) with two parameters
 % The lengthscale ℓ determines the length of the 'wiggles' in your function. In general, you won't be able to extrapolate more than ℓ units away from your data.
 % The output variance σ2 determines the average distance of your function away from its mean. Every kernel has this parameter out in front; it's just a scale factor.
-lengthScale = 0.01; % one third the search space should be but this is what we have set
-scaleFactor = 0.01;
+lengthScale = (maxRange-minRange)/3; % one third the search space should be but this is what we have set
+scaleFactor = (maxRange-minRange)/3;
 nodes{1} = root;
 
 
@@ -155,15 +155,15 @@ while(true)
 				end  
 			end
 			% plot
-			if (opts.IS_VERBOSE)
-				figure(1)
-				xlim([opts.MIN_RANGE(1) opts.MAX_RANGE(1)]);
-				ylim([opts.MIN_RANGE(2) opts.MAX_RANGE(2)])
-				scatter(newNodes(f).x(1),newNodes(f).x(2),'.k')
-				rectangle('Position',[newNodes(f).bc.minX(1), newNodes(f).bc.minX(2), newNodes(f).bc.maxX(1)-newNodes(f).bc.minX(1), newNodes(f).bc.maxX(2)-newNodes(f).bc.minX(2)]);
-				hold on
-				pause(0.1);
-			end
+			%if (opts.IS_VERBOSE)
+			%	figure(1)
+			%	xlim([opts.MIN_RANGE(1) opts.MAX_RANGE(1)]);
+			%	ylim([opts.MIN_RANGE(2) opts.MAX_RANGE(2)])
+			%	scatter(newNodes(f).x(1),newNodes(f).x(2),'.k')
+			%	rectangle('Position',[newNodes(f).bc.minX(1), newNodes(f).bc.minX(2), newNodes(f).bc.maxX(1)-newNodes(f).bc.minX(1), newNodes(f).bc.maxX(2)-newNodes(f).bc.minX(2)]);
+			%	hold on
+			%	pause(0.1);
+			%end
 			% check fitness value & update
 			if ((opts.yBest > newNodes(f).y) && (isEvaluated))
 				opts.yBest = newNodes(f).y;

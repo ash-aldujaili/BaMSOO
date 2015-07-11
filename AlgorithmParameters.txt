@@ -1,0 +1,56 @@
+This file details, how the partitioning-based algorithms are called and set:
+
+
+maxRange = 5;
+minRange =-5;
+numEvaluations = 1e4 * DIM;
+
+% DIRECT algorithm:
+    bounds = repmat([minRange maxRange], DIM,1);       
+    options.maxevals = numEvaluations;
+    options.maxits = numEvaluations;
+    options.globalmin = ftarget;
+    options.testflag = 0;
+    options.showits = 0;
+    options.tol = 0;
+    Problem.f = @(x) feval(FUN,(maxRange-minRange)*x+minRange);
+    [fmin,xbest,hist] = Direct(Problem,bounds,options);
+	
+% MCS algorithm:
+    data = 'cam';	% select test function from Jones et al. test set
+    func = @(data,x) feval(FUN,x);
+    bounds = repmat([minRange maxRange], DIM, 1);  
+    smax = 5*DIM+10;   
+    stop = [0 ftarget];
+    [xbest,fbest,xmin,fmi,ncall,ncloc,flag]=mcs(func,data,bounds(:,1),bounds(:,2),0,smax,numEvaluations,stop,0,numEvaluations/5);
+	
+% SOO algorithm:
+    % soo is a maximaztion probelm
+    clear settings;  
+    settings.type = 'det';
+    settings.dim = DIM;
+    func = @(x) -feval(FUN,((maxRange-minRange)*x+ minRange)');
+    [xbest, finaly, ~] = oo(func, numEvaluations, settings, -ftarget);
+    xbest = (maxRange-minRange) * xbest' + minRange;
+	
+% BaMSOO algorithm:
+    dimension = DIM;
+    func = @(x) feval(FUN,x);
+    BaMSOOv2(func, ftarget, dimension, maxRange, minRange, numEvaluations);
+	
+% BB-LS algorithm:
+   func = @(x,Prob) feval(FUN,x);
+   x_L = minRange * ones(DIM,1);
+   x_U = maxRange * ones(DIM,1);
+   Prob = glcAssign(func, x_L, x_U, [], [], [], [], ...
+      [], [], [], [], ...
+      [], [], [], [], ...
+      [], [], [], ftarget, []);
+   Prob.optParam.MaxFunc = numEvaluations;
+   Prob.MaxFunc = numEvaluations;
+   Prob.LGO.options.opmode = 1;
+   Prob.LGO.options.g_maxfct = numEvaluations;
+   Prob.LGO.options.max_nosuc = numEvaluations;
+   Prob.LGO.options.g_target = ftarget;
+   Prob.LGO.options.l_target = ftarget;
+   Result = tomRun('lgo', Prob, 1);
