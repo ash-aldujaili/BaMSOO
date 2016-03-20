@@ -33,3 +33,18 @@ ftarget = 1e-5;
 [yBest, xBest, nodes ]= BaMSOO(func, ftarget, dimension, maxRange, minRange, numEvaluations);
 fprintf('optimal f-value is %f\n',yBest)
 ~~~
+
+#Citation
+If you write a scientific paper describing research that made use of this code, please cite the following paper:
+~~~
+@InProceedings{ash-bamsoo-15,
+  Title                    = {Analysis of the Bayesian Multi-Scale Optimistic Optimization on the {CEC2016} and {BBOB} Testbeds},
+  Author                   = {Abdullah Al-Dujaili and S. Suresh},
+  Booktitle                = {{IEEE} Congress on Evolutionary Computation ({CEC})},
+  Year                     = {2016},
+ Month                    = {July},
+  Owner                    = {aldujail001},
+  Timestamp                = {2015.07.01}
+}
+~~~
+
